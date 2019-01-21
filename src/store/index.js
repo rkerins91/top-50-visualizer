@@ -6,17 +6,38 @@ const initialState = {
   songData: data,
   songFeatures: features,
   chartData: {},
-  chartOptions: {}
+  chartOptions: {},
+  type: 'bar'
 }
 
 const GET_CHART_PROPS = 'GET_CHART_PROPS'
+const GET_SONGS = 'GET_SONGS'
+const GET_FEATURES = 'GET_FEATURES'
 
-const chartProps = option => {
+export const getChartProps = option => {
   return {
     type: GET_CHART_PROPS,
     option
   }
 }
+
+export const gotSongs = user => {
+  return {
+    type: GET_SONGS,
+    user
+  }
+}
+
+export const gotFeatures = songs => {
+  return {
+    type: GET_FEATURES,
+    songs
+  }
+}
+
+
+// THUNKS FOR GOT SONGS AND FEATURES
+
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
@@ -24,8 +45,8 @@ const reducer = (state = initialState, action) => {
     const values = [], label = [], colors = []
     
     state.songFeatures.audio_features.forEach((ele, idx) => {
-      values.push(ele[action.option])
-      label.push(idx)
+      action.option === 'popularity' ? values.push(state.songData.items[idx].popularity) : values.push(ele[action.option])
+      label.push(idx + 1)
       colors.push('rgba(' + 
       (Math.floor(Math.random() * 128 + 64)) + ', ' +
       (Math.floor(Math.random() * 128 + 64)) + ', ' +
@@ -50,7 +71,7 @@ const reducer = (state = initialState, action) => {
           },
           title: {
             display: true,
-            text: action.option + 'of Your Top 50',
+            text: action.option[0].toUpperCase() + action.option.slice(1) + ' of Your Top 50',
             fontSize: 25
           },
           legend: {
@@ -58,6 +79,10 @@ const reducer = (state = initialState, action) => {
           }
         }
       }
+    case GET_SONGS:
+      return {...state}
+    case GET_FEATURES:
+      return {...state}
     default:
       return state
   }

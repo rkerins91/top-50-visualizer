@@ -1,43 +1,49 @@
 import React, { Component } from 'react';
 import '../App.css';
-import Danceability from './Danceability' 
-
-import Popularity from './Popularity'
-import {BrowserRouter as Router, Route} from 'react-router-dom'
+import Navbar from './Navbar'
+import Chart from './Chart';
+import SongList from './SongList';
+import { connect } from 'react-redux'
+import { gotSongs, gotFeatures } from '../store'
+import { data, features } from '../dummyData'
 
 class App extends Component {
   constructor(props) {
     super(props)
   }
 
+  componentDidMount() {
+    this.props.getSongs(data)
+    this.props.getFeatures(features)
+  }
+
   render() {
     return (
-      <div className="App">
-        <div id='bar'>
-            <Route to='/danceability'
-              render={(props) => 
-                <Danceability {...props} 
-                features={this.props.state.features.audio_features}
-                data={this.props.state.data.items}
-                />
-              }
-            />
-            <Route to='/popularity'
-              render={(props) => 
-                <Danceability {...props} 
-                features={this.props.state.features.audio_features}
-                data={this.props.state.data.items}
-                />
-              }
-            />
-              
-          {/* <div id='song-list'>
-            <SongList songs={this.props.state.data.items.map(item => item.name)}/>
-          </div> */}
+      <>
+        <Navbar id='nav'/>
+        <div id='main'>
+          <Chart className='chart-container' data={this.props.data} options={this.props.options}/>
+          <SongList id='song-list' />
         </div>
-        </div>
+      </>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    data: state.chartData,
+    options: state.chartOptions
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    getSongs: data => dispatch(gotSongs(data)),
+    getFeatures: songs => dispatch(gotFeatures(songs))
+  }
+}
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
