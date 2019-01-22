@@ -2,14 +2,17 @@ const express = require('express')
 const request = require('request')
 const querystring = require('querystring')
 const path = require('path')
+const bodyParser = require('body-parser')
+
 
 const app = express()
 
 const redirect_uri = 
-  process.env.REDIRECT_URI || 
-  'http://localhost:3000/callback'
+process.env.REDIRECT_URI || 
+'http://localhost:3000/callback'
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(bodyParser.json(), bodyParser.urlencoded({ extended: true }))
 
 app.get('/login', async function(req, res) {
   await res.redirect('https://accounts.spotify.com/authorize?' +
@@ -43,6 +46,28 @@ app.get('/callback', function(req, res) {
     await res.redirect(uri + '?access_token=' + access_token)
   })
 })
+
+app.post('/getSongs', async (req, res, next) => {
+  console.log(req.body.params)
+  const token = req.body.params.token
+  const reqBody = querystring.stringify({Authorization: `Bearer ${token }`, limit: '50', time_range: 'medium_term', 'content-type': 'application/json'})
+  const data = await app.get('https://api.spotify.com/v1/me/top/tracks?' + reqBody, (req, res, next) => {
+  })
+  
+  await res.send(data)
+  
+})
+
+// app.post('/getFeatures', async (req, res, next) => {
+//   console.log(req.body.params)
+//   const token = req.body.params.token
+//   const reqBody = querystring.stringify({Authorization: `Bearer ${token }`, limit: '50', time_range: 'medium_term'})
+//   const data = await app.get('https://api.spotify.com/v1/me/top/tracks?' + reqBody, (req, res, next) => {
+//   })
+  
+//   res.send(data)
+  
+// })
 
 app.get('*', function (req, res, next) {
   res.sendFile(path.join(__dirname, 'public/index.html'))

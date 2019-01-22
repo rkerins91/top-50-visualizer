@@ -4,32 +4,46 @@ import Navbar from './Navbar'
 import Chart from './Chart';
 import SongList from './SongList';
 import { connect } from 'react-redux'
-import { gotSongs, gotFeatures, gotToken } from '../store'
+import { getSongs, gotFeatures, gotToken } from '../store'
 import { data, features } from '../dummyData'
 import queryString from 'query-string'
+import SpotifyLogin from './SpotifyLogin'
+import store from '../store'
 
 class App extends Component {
   constructor(props) {
     super(props)
   }
-
+  
   componentDidMount() {
-  //   // const parsed = queryString.parse(window.location.search)
-  //   // this.props.getToken(parsed.access_token)
-       this.props.gotSongs(data)
-  //   this.props.getFeatures(features)
-  //   // console.log(this.props.songs)
+    // console.log(this.props)
+    const parsed = queryString.parse(window.location.search)
+    this.props.getToken(parsed.access_token)
+    this.props.getSongs(parsed.access_token)
+    // this.props.getSongs(data.items.map(ele => [ele.name, ele.popularity, ele.artists[0].name, ele.id]))
+    // this.props.getFeatures(features)
   }
 
   render() {
     return (
       <>
+      {!this.props.accessToken ? (
+        <div className='fill-viewport'>
+          <img id="background" className="fill-viewport" src='static/images/background.png' />
+          <div id='black-overlay' className='fill-viewport'>
+            <SpotifyLogin />
+          </div>
+        </div>
+      ) : (
+        <>
         <Navbar id='nav'/>
         <div id='main'>
         {console.log(this.props)}
           <Chart className='chart-container' data={this.props.data} options={this.props.options}/>
           <SongList id='song-list' songs={this.props.songs}/>
         </div>
+        </>)
+      }
       </>
     );
   }
@@ -40,13 +54,13 @@ const mapStateToProps = state => {
     data: state.chartData,
     options: state.chartOptions,
     accessToken: state.accessToken,
-    songs: state.songData
+    songs: state.songList
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    gotSongs: (data) => dispatch(gotSongs(data)),
+    getSongs: (token) => dispatch(getSongs(token)),
     getFeatures: (data) => dispatch(gotFeatures(data)),
     getToken: token  => dispatch(gotToken(token))
   }
@@ -55,3 +69,45 @@ const mapDispatchToProps = dispatch => {
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  FIX STATE BY CHECKING IMMUTABILITY -- CONSIDER MULTIPLE STORE

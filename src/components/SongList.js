@@ -1,28 +1,35 @@
 import React from 'react'
 import Song from './Song'
-import { getSongs } from '../store'
+import { gotSongs } from '../store'
 import {connect} from 'react-redux'
 
-const SongList = (props) => {
+class SongList extends React.Component {
+  constructor(props) {
+    super(props)
+    // console.log(props)
+  }
 
-
+  render() {
   return (
-    <div id={props.id}>
-    {console.log(props)}
-      {props.songs.items.map((song, idx) => {
-        return <Song key={idx} title={song.name} artist={song.artists[0].name} number={idx + 1} />
+    <div id={this.props.id}>
+    {/* {console.log('look at props here', this.props)} */}
+      {this.props.songs.map((song, idx) => {
+        return <Song key={idx} title={song[0]} number={idx + 1} artist={song[2]}/>
       })}
     </div>
   )
+  }
 }
 
 
 // const mapDispatchToProps = dispatch => {
 //   return {
-//     gettSongs: (token) =>
-//       dispatch(getSongs(token))
+//     getSongs: (songs) =>
+//       dispatch(gotSongs(songs))
 //   }
 // }
 
 
 export default /*connect(null, mapDispatchToProps)(*/SongList//)
+
+
