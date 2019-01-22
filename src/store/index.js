@@ -1,5 +1,8 @@
 import {data, features} from '../dummyData'
-import {createStore} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
+import {composeWithDevTools} from 'redux-devtools-extension'
+import {createLogger} from 'redux-logger'
+import axios from 'axios'
 
 
 const initialState = {
@@ -7,12 +10,14 @@ const initialState = {
   songFeatures: features,
   chartData: {},
   chartOptions: {},
-  type: 'bar'
+  type: 'bar',
+  accessToken: null
 }
 
 const GET_CHART_PROPS = 'GET_CHART_PROPS'
 const GET_SONGS = 'GET_SONGS'
 const GET_FEATURES = 'GET_FEATURES'
+const GET_TOKEN = 'GET_TOKEN'
 
 export const getChartProps = option => {
   return {
@@ -21,10 +26,17 @@ export const getChartProps = option => {
   }
 }
 
-export const gotSongs = user => {
+export const gotToken = token => {
+  return {
+    type: GET_TOKEN,
+    token
+  }
+}
+
+export const gotSongs = songs => {
   return {
     type: GET_SONGS,
-    user
+    songs
   }
 }
 
@@ -37,7 +49,12 @@ export const gotFeatures = songs => {
 
 
 // THUNKS FOR GOT SONGS AND FEATURES
-
+export const getSongs = () => async dispatch => {
+  const { data } = await axios.get('https://api.spotify.com/v1/me/top/tracks', 
+    {headers: { Authorization: `Bearer ${initialState.accessToken }`}})
+    console.log(data)
+    dispatch(gotSongs(data))
+}
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
@@ -79,8 +96,10 @@ const reducer = (state = initialState, action) => {
           }
         }
       }
+    case GET_TOKEN: 
+      return {...state, accessToken: action.token}
     case GET_SONGS:
-      return {...state}
+      return {...state, songData: state.songData}
     case GET_FEATURES:
       return {...state}
     default:
@@ -88,6 +107,7 @@ const reducer = (state = initialState, action) => {
   }
 }
 
+// const middleware = composeWithDevTools(applyMiddleware(createLogger({collapsed: true})))
 const store = createStore(reducer)
 
 export default store

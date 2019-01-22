@@ -4,8 +4,9 @@ import Navbar from './Navbar'
 import Chart from './Chart';
 import SongList from './SongList';
 import { connect } from 'react-redux'
-import { gotSongs, gotFeatures } from '../store'
+import { gotSongs, gotFeatures, gotToken } from '../store'
 import { data, features } from '../dummyData'
+import queryString from 'query-string'
 
 class App extends Component {
   constructor(props) {
@@ -13,8 +14,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.props.getSongs(data)
-    this.props.getFeatures(features)
+  //   // const parsed = queryString.parse(window.location.search)
+  //   // this.props.getToken(parsed.access_token)
+       this.props.gotSongs(data)
+  //   this.props.getFeatures(features)
+  //   // console.log(this.props.songs)
   }
 
   render() {
@@ -22,8 +26,9 @@ class App extends Component {
       <>
         <Navbar id='nav'/>
         <div id='main'>
+        {console.log(this.props)}
           <Chart className='chart-container' data={this.props.data} options={this.props.options}/>
-          <SongList id='song-list' />
+          <SongList id='song-list' songs={this.props.songs}/>
         </div>
       </>
     );
@@ -33,14 +38,17 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     data: state.chartData,
-    options: state.chartOptions
+    options: state.chartOptions,
+    accessToken: state.accessToken,
+    songs: state.songData
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    getSongs: data => dispatch(gotSongs(data)),
-    getFeatures: songs => dispatch(gotFeatures(songs))
+    gotSongs: (data) => dispatch(gotSongs(data)),
+    getFeatures: (data) => dispatch(gotFeatures(data)),
+    getToken: token  => dispatch(gotToken(token))
   }
 }
 

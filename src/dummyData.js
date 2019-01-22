@@ -4852,13 +4852,3 @@ const features =
   ]
 }
 
-const songIds = [];
-const featureIds = [];
-
-for (let i = 0; i < 50; i++) {
-  songIds.push(data.items[i].id)
-  featureIds.push(features.audio_features[i].id)
-  console.log(songIds[i] === featureIds[i])
-}
-
-export {data, features}

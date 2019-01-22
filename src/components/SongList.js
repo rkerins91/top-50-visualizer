@@ -1,9 +1,10 @@
 import React from 'react'
 import Song from './Song'
-import { gotSongs } from '../store'
+import { getSongs } from '../store'
 import {connect} from 'react-redux'
 
 const SongList = (props) => {
+
 
   return (
     <div id={props.id}>
@@ -15,18 +16,13 @@ const SongList = (props) => {
   )
 }
 
-const mapStateToProps = state => {
-  return {
-    songs: state.songData
-  }
-}
 
-const mapDispatchToProps = dispatch => {
-  return {
-    gotSongs: () =>
-      dispatch(gotSongs())
-  }
-}
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     gettSongs: (token) =>
+//       dispatch(getSongs(token))
+//   }
+// }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(SongList)
+export default /*connect(null, mapDispatchToProps)(*/SongList//)
