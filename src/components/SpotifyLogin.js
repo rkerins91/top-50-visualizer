@@ -11,7 +11,7 @@ class SpotifyLogin extends Component {
   render() {
     return (
       <div id='spotify-login-container'>
-        <h3>My Top 50 Visualizer</h3>
+        <h3>Top 50 Visualizer</h3>
         <button id="spotify-login-button" type='btn'
           onClick={()=>window.location = 'http://localhost:3000/login'}>Login with Spotify</button>
         <p>Click the button above to view the attributes of your top 50 Spotify songs</p>

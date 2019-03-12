@@ -4,7 +4,7 @@ import Navbar from './Navbar'
 import Chart from './Chart';
 import SongList from './SongList';
 import { connect } from 'react-redux'
-import { getSongs, gotFeatures, gotToken } from '../store'
+import { getSongs, gotToken } from '../store'
 import { data, features } from '../dummyData'
 import queryString from 'query-string'
 import SpotifyLogin from './SpotifyLogin'
@@ -15,13 +15,10 @@ class App extends Component {
     super(props)
   }
   
-  componentDidMount() {
-    // console.log(this.props)
+  async componentDidMount() {
     const parsed = queryString.parse(window.location.search)
     this.props.getToken(parsed.access_token)
-    this.props.getSongs(parsed.access_token)
-    // this.props.getSongs(data.items.map(ele => [ele.name, ele.popularity, ele.artists[0].name, ele.id]))
-    // this.props.getFeatures(features)
+    await this.props.getSongs(parsed.access_token)
   }
 
   render() {
@@ -61,7 +58,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     getSongs: (token) => dispatch(getSongs(token)),
-    getFeatures: (data) => dispatch(gotFeatures(data)),
     getToken: token  => dispatch(gotToken(token))
   }
 }

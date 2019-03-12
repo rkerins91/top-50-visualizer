@@ -22,13 +22,6 @@ class SongList extends React.Component {
 }
 
 
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     getSongs: (songs) =>
-//       dispatch(gotSongs(songs))
-//   }
-// }
-
 
 export default /*connect(null, mapDispatchToProps)(*/SongList//)
 

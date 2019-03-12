@@ -52,78 +52,92 @@ export const gotFeatures = songs => {
 
 // THUNKS FOR GOT SONGS AND FEATURES
 export const getSongs = (token) => async dispatch => {
-  console.log('token', token)
-  const { data } = await axios.post('/getSongs', {
+  const { data } = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
       params: {
-        token: token
+        'time_range': 'medium_term',
+        'limit': '50'
       }
+    }
+  )
+  const songs = data.items.map(ele => 
+    [ele.name, ele.popularity, ele.artists[0].name, ele.id])
+
+  dispatch(gotSongs(songs))
+  dispatch(getFeatures(token, songs))
+  }
+
+
+const getFeatures = (token, songs) => async dispatch => {
+  console.log(initialState)
+  const ids = songs.map(ele => ele[3]).join(',') 
+  console.log(ids)
+  const { data } = await axios.get('https://api.spotify.com/v1/audio-features', {
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    params: {
+      'ids': ids
+    }
     }
   )
     console.log('data here', data)
 
-  dispatch(gotSongs(data))
+  dispatch(gotFeatures(data.audio_features))
 }
-
-// export const getFeatures = (token) => async dispatch => {
-//   console.log('token', token)
-//   const ids = initialState.songList.map(ele => ele.id).join(',') 
-//   const { data } = await axios.post('/getFeatures', {
-//       params: {
-//         token: token
-//       }
-//     }
-//   )
-//     console.log('data here', data)
-
-//   dispatch(gotFeatures(data))
-// }
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
-    // case GET_CHART_PROPS:
-    // const values = [], label = [], colors = []
+    case GET_CHART_PROPS:
+    const values = [], label = [], colors = []
     
-    // state.songFeatures.audio_features.forEach((ele, idx) => {
-    //   action.option === 'popularity' ? values.push(state.songList[idx][1]) : values.push(ele[action.option])
-    //   label.push(idx + 1)
-    //   colors.push('rgba(' + 
-    //   (Math.floor(Math.random() * 128 + 64)) + ', ' +
-    //   (Math.floor(Math.random() * 128 + 64)) + ', ' +
-    //   (Math.floor(Math.random() * 128 + 64)) + ', .8)')
-    // })
-    //   return {...state,
-    //     chartData: {
-    //       labels: label,
-    //       datasets: [
-    //         {data: values,
-    //         backgroundColor: colors}
-    //       ]
-    //     },
-    //     chartOptions: {
-    //       scales: {
-    //         maintainAspectRatio: true,
-    //         xAxes: [{
-    //             categorySpacing: 0,
-    //             barPercentage: 1,
-    //             categoryPercentage: 1
-    //         }],
-    //       },
-    //       title: {
-    //         display: true,
-    //         text: action.option[0].toUpperCase() + action.option.slice(1) + ' of Your Top 50',
-    //         fontSize: 25
-    //       },
-    //       legend: {
-    //         display: false
-    //       }
-    //     }
-    //   }
+    state.songFeatures.forEach((ele, idx) => {
+      action.option === 'popularity' ? values.push(state.songList[idx][1]) : values.push(ele[action.option])
+      label.push(idx + 1)
+      colors.push('rgba(' + 
+      (Math.floor(Math.random() * 128 + 64)) + ', ' +
+      (Math.floor(Math.random() * 128 + 64)) + ', ' +
+      (Math.floor(Math.random() * 128 + 64)) + ', .8)')
+    })
+      return {...state,
+        chartData: {
+          labels: label,
+          datasets: [
+            {data: values,
+            backgroundColor: colors}
+          ]
+        },
+        chartOptions: {
+          scales: {
+            maintainAspectRatio: true,
+            xAxes: [{
+                categorySpacing: 0,
+                barPercentage: 1,
+                categoryPercentage: 1
+            }],
+          },
+          title: {
+            display: true,
+            text: action.option[0].toUpperCase() + action.option.slice(1) + ' of Your Top 50',
+            fontSize: 25
+          },
+          legend: {
+            display: false
+          }
+        }
+      }
     case GET_TOKEN: 
       return {...state, accessToken: action.token}
     case GET_SONGS:
       return {...state, songList: action.songs}
-    // case GET_FEATURES:
-    //   return {...state, songFeatures: action.songs}
+    case GET_FEATURES:
+      return {...state, songFeatures: action.songs}
     default:
       return state
   }

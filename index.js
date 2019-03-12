@@ -3,12 +3,13 @@ const request = require('request')
 const querystring = require('querystring')
 const path = require('path')
 const bodyParser = require('body-parser')
+const {REDIRECT_URI, SPOTIFY_CLIENT_ID, SPOTIFY_SECRET} = require('./secrets')
 
 
 const app = express()
 
 const redirect_uri = 
-process.env.REDIRECT_URI || 
+REDIRECT_URI || 
 'http://localhost:3000/callback'
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
@@ -18,9 +19,9 @@ app.get('/login', async function(req, res) {
   await res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
-      client_id: 'a503fe3508eb468d998289055d0d249a',
+      client_id: SPOTIFY_CLIENT_ID,
       scope: 'user-top-read',
-      redirect_uri: 'http://localhost:3000/callback'
+      redirect_uri: redirect_uri
     }))
 })
 
@@ -30,12 +31,12 @@ app.get('/callback', function(req, res) {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code: code,
-      redirect_uri: 'http://localhost:3000/callback',
+      redirect_uri: redirect_uri,
       grant_type: 'authorization_code'
     },
     headers: {
       'Authorization': 'Basic ' + (new Buffer(
-        'a503fe3508eb468d998289055d0d249a:92bc670cb7fc44cab35c852692cfbbe9'
+        `${SPOTIFY_CLIENT_ID}:${SPOTIFY_SECRET}`
       ).toString('base64'))
     },
     json: true
@@ -47,16 +48,8 @@ app.get('/callback', function(req, res) {
   })
 })
 
-app.post('/getSongs', async (req, res, next) => {
-  console.log(req.body.params)
-  const token = req.body.params.token
-  const reqBody = querystring.stringify({Authorization: `Bearer ${token }`, limit: '50', time_range: 'medium_term', 'content-type': 'application/json'})
-  const data = await app.get('https://api.spotify.com/v1/me/top/tracks?' + reqBody, (req, res, next) => {
-  })
-  
-  await res.send(data)
-  
-})
+// app.post('/getSongs', async (req, res, next) => {
+
 
 // app.post('/getFeatures', async (req, res, next) => {
 //   console.log(req.body.params)

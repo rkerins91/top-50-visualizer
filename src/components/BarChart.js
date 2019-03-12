@@ -8,7 +8,7 @@ const BarChart = (props) => {
     <div id={props.id}>
       <Bar
         data={props.data}
-        height={650}
+        height={600}
         width={950}
         options={props.options}/>
     </div>
